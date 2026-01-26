@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Project Report"
+description: "Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution"
+permalink: report/
+---
+
 # Project Report: *Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution*
 
 ---
