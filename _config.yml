@@ -1,8 +1,8 @@
 # Jekyll Configuration for GitHub Pages
 title: "Spatial Analysis of Environmental Inequity in Salt Lake City"
 description: "Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution"
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site
+baseurl: "/AirQualityVsAgeDemographics" # the subpath of your site
+url: "https://Loadingname91.github.io" # the base hostname & protocol for your site
 
 # Build settings
 markdown: kramdown

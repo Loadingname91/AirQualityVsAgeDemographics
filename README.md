@@ -222,11 +222,18 @@ This project includes a Jekyll-based GitHub Pages site with:
 
 ### Enabling GitHub Pages
 
-1. Go to your repository Settings → Pages
-2. Select source: "Deploy from a branch"
-3. Choose branch: `main` (or your default branch)
-4. Select folder: `/ (root)`
-5. GitHub will automatically build and deploy the site
+**Important:** This repository uses GitHub Actions to build and deploy the site. Follow these steps:
+
+1. Go to your repository on GitHub
+2. Navigate to **Settings** → **Pages**
+3. Under **Source**, select **"GitHub Actions"** (NOT "Deploy from a branch")
+4. The workflow will automatically run when you push to the `master` or `main` branch
+5. You can also manually trigger it from the **Actions** tab → **Deploy Jekyll with GitHub Pages dependencies preinstalled** → **Run workflow**
+
+**Note:** If you see "There isn't a GitHub Pages site here", make sure:
+- The source is set to **"GitHub Actions"** (not a branch)
+- The workflow has run successfully (check the Actions tab)
+- The workflow completed without errors
 
 Your site will be available at: `https://Loadingname91.github.io/AirQualityVsAgeDemographics/`
 

@@ -1,6 +1,4 @@
-# Project Report: Spatial Analysis of Environmental Inequity in Salt Lake City
-
-### *Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution*
+# Project Report: *Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution*
 
 ---
 
