@@ -2,6 +2,7 @@
 layout: default
 title: "EPA Analysis"
 description: "EPA AQS Analysis (January 1-30, 2025) - Regulatory-grade PM2.5 monitoring data"
+permalink: /epa-analysis/
 ---
 
 # EPA AQS Analysis (January 1-30, 2025)

@@ -2,6 +2,7 @@
 layout: default
 title: "PurpleAir Analysis"
 description: "PurpleAir Analysis (January 1-25, 2026) - Community sensor network PM2.5 data"
+permalink: /purpleair-analysis/
 ---
 
 # PurpleAir Analysis (January 1-25, 2026)
