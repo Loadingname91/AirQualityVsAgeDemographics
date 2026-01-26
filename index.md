@@ -7,7 +7,6 @@ permalink: /
 
 # Project Report: *Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution*
 
----
 
 ## 1. Project Overview
 

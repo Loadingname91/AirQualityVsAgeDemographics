@@ -80,6 +80,35 @@
             padding: 0 20px;
         }
         
+        /* Markdown content styling */
+        .content p {
+            margin: 1rem 0;
+        }
+        
+        .content a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .content a:hover {
+            text-decoration: underline;
+        }
+        
+        .content strong {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .content em {
+            font-style: italic;
+        }
+        
+        .content hr {
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 2rem 0;
+        }
+        
         h1, h2, h3, h4, h5, h6 {
             color: #2c3e50;
             margin-top: 2rem;
@@ -174,6 +203,49 @@
             padding-left: 1rem;
             margin: 1rem 0;
             color: #555;
+        }
+        
+        /* List styling for markdown content */
+        .content ul,
+        .content ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+        
+        .content ul {
+            list-style-type: disc;
+        }
+        
+        .content ol {
+            list-style-type: decimal;
+        }
+        
+        .content li {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+        
+        /* Nested lists */
+        .content ul ul,
+        .content ol ol,
+        .content ul ol,
+        .content ol ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .content ul ul {
+            list-style-type: circle;
+        }
+        
+        .content ul ul ul {
+            list-style-type: square;
+        }
+        
+        /* Ensure navigation lists are not affected */
+        nav ul {
+            list-style: none;
+            padding-left: 0;
         }
         
         footer {
