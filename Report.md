@@ -5,18 +5,18 @@
 ## 1. Project Overview
 
 ### Research Question
-This project investigates the spatial correlation between vulnerable demographic groups (specifically residents aged 80+) and exposure to PM2.5 particulate matter during winter inversion events in the Salt Lake Valley. 
+This project investigates the spatial correlation between vulnerable demographic groups (specifically residents aged 80+) and exposure to PM2.5 particulate matter in the Salt Lake and surrounding counties. 
 
 ### Study Area
-- **Counties:** Salt Lake County (FIPS 49035) and Davis County (FIPS 49011), Utah
+- **Counties:** Salt Lake County (FIPS 49035), Davis County (FIPS 49011), and Utah County (FIPS 49053), Utah
 
 ### Proof-of-Concept Approach
-This report presents a **proof-of-concept demonstration** of geospatial analysis capabilities using two independent air quality data sources:
+This report presents a demonstration of geospatial analysis capabilities using two independent air quality data sources:
 
 1. **EPA AQS Analysis (January 1-30, 2025):** Regulatory-grade monitoring data from 10 official EPA stations
 2. **PurpleAir Analysis (January 1-25, 2026):** Community sensor network data from 254 validated sensors
 
-**Important Note:** These analyses are **independent** and cannot be directly compared due to different time periods. The purpose is to demonstrate technical capability with different data sources and methodologies. The final analysis will use a consistent time period based on advisor feedback.
+**Important Note:** I did this analysis as a proof of concept to see how we can use the data to visualize the correlation between the demographic distribution and the air quality. The time period is not consistent between the two datasets, since the EPA data is from 2025 and the PurpleAir data is from 2026 , this is because the EPA data is not available for the year 2026.
 
 ### Key Findings Preview
 - **Demographic Distribution:** 36,524 residents aged 80+ across 301 inhabited census tracts
@@ -28,7 +28,7 @@ This report presents a **proof-of-concept demonstration** of geospatial analysis
 
 ## 2. Data Acquisition Strategy (The "Iterative" Process)
 
-I explored three distinct datasets to find the best balance between **coverage** (spatial density) and **accuracy** (scientific rigor).
+I explored three distinct datasets 
 
 ### A. Demographic Data (The "People" Layer)
 

@@ -1,5 +1,5 @@
 # Jekyll Configuration for GitHub Pages
-title: "Spatial Analysis of Environmental Inequity in Salt Lake City"
+title: "Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution"
 description: "Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution"
 baseurl: "/AirQualityVsAgeDemographics" # the subpath of your site
 url: "https://Loadingname91.github.io" # the base hostname & protocol for your site
