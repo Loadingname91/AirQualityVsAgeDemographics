@@ -1,0 +1,37 @@
+# Jekyll Configuration for GitHub Pages
+title: "Spatial Analysis of Environmental Inequity in Salt Lake City"
+description: "Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution"
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - .git
+  - .gitignore
+  - Data/
+  - __pycache__/
+  - *.py
+  - requirements.txt
+  - calculate_statistics.py
+  - descriptive_statistics.txt
+
+# Enable relative URLs
+relative_links:
+  enabled: true
+  collections: true
+

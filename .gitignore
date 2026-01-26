@@ -1,0 +1,101 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+
+# Data files (large files that shouldn't be in git)
+# Uncomment if you want to exclude data files
+# Data/
+# *.csv
+# *.shp
+# *.shx
+# *.dbf
+# *.prj
+
+# Logs
+*.log
+*.txt
+!requirements.txt
+!descriptive_statistics.txt
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# API keys and secrets (if any)
+*.key
+*.pem
+secrets.json
+config.json
+
+# Analysis outputs (optional - uncomment if you don't want to track generated files)
+# EPADataAnalysis/*.png
+# EPADataAnalysis/*.html
+# PurpleAirDataAnalysis/*.png
+# PurpleAirDataAnalysis/*.html
+
+# Keep assets for GitHub Pages
+!assets/
+!assets/**/*
+
+
+.cursor/*
+
+.generate*
