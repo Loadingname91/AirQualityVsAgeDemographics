@@ -66,7 +66,7 @@ def load_and_filter_shapefile(shapefile_path):
 def process_census_data(census_path):
     """
     Load ACS demographic data and calculate population 80+.
-    Returns DataFrame with cleaned GEO_ID and pop_80_plus column.
+    Returns DataFrame with cleaned GEO_ID, pop_80_plus (raw count), and pop_80_plus_pct (percentage).
     """
     print("\nStep B: Processing census demographic data...")
     
@@ -89,14 +89,22 @@ def process_census_data(census_path):
     # Calculate total 80+ population
     df['pop_80_plus'] = df[age_columns].sum(axis=1)
     
+    # Get total population (B01001_001E is the total population column)
+    df['total_pop'] = pd.to_numeric(df['B01001_001E'], errors='coerce').fillna(0)
+    
+    # Calculate percentage of population 80+
+    # Avoid division by zero by replacing 0 with 1
+    df['pop_80_plus_pct'] = (df['pop_80_plus'] / df['total_pop'].replace(0, 1)) * 100
+    
     # Fix GEO_ID: strip the "1400000US" prefix to match shapefile GEOID
     df['GEOID'] = df['GEO_ID'].str.replace('1400000US', '', regex=False)
     
-    # Keep only necessary columns
-    census_df = df[['GEOID', 'NAME', 'pop_80_plus']].copy()
+    # Keep necessary columns
+    census_df = df[['GEOID', 'NAME', 'pop_80_plus', 'pop_80_plus_pct']].copy()
     
     print(f"  Processed {len(census_df)} census tract records")
     print(f"  Total 80+ population in dataset: {census_df['pop_80_plus'].sum():,.0f}")
+    print(f"  Average percentage 80+ in dataset: {census_df['pop_80_plus_pct'].mean():.2f}%")
     
     return census_df
 
@@ -538,8 +546,9 @@ def create_visualization(merged_gdf, grid_x, grid_y, grid_pm25, air_df, date_ran
         cx.add_basemap(ax, source=cx.providers.CartoDB.Positron)
 
     # LEFT MAP: Population
-    merged_gdf.plot(column='pop_80_plus', ax=ax1, cmap='Blues', alpha=0.8, 
-                   edgecolor='black', linewidth=0.3, legend=True)
+    merged_gdf.plot(column='pop_80_plus_pct', ax=ax1, cmap='Blues', alpha=0.8, 
+                   edgecolor='black', linewidth=0.3, legend=True,
+                   legend_kwds={'label': 'Percentage of Residents Age 80+'})
     ax1.set_title(f'Distribution of Residents Age 80+\nSalt Lake & Davis Counties', fontsize=16)
 
     # RIGHT MAP: Air Quality
@@ -609,6 +618,10 @@ def create_interactive_map(merged_gdf, air_df, date_range, output_file="slc_anal
     """
     print("\nStep F: Creating interactive Folium map...")
     
+    # Add formatted fields for tooltip display
+    merged_gdf['pop_80_plus_pct_formatted'] = merged_gdf['pop_80_plus_pct'].apply(lambda x: f"{x:.1f}%")
+    merged_gdf['pop_80_plus_formatted'] = merged_gdf['pop_80_plus'].apply(lambda x: f"{int(x):,}")
+    
     # Convert merged_gdf to WGS84 (EPSG:4326) for Folium
     gdf_wgs84 = merged_gdf.to_crs(epsg=4326)
     
@@ -635,13 +648,13 @@ def create_interactive_map(merged_gdf, air_df, date_range, output_file="slc_anal
     choropleth = folium.Choropleth(
         geo_data=gdf_wgs84.__geo_interface__,
         data=gdf_wgs84,
-        columns=['GEOID', 'pop_80_plus'],
+        columns=['GEOID', 'pop_80_plus_pct'],
         key_on='feature.properties.GEOID',
         fill_color='Blues',
         fill_opacity=0.6,
         line_opacity=0.3,
         line_weight=1,
-        legend_name='Population Age 80+',
+        legend_name='Percentage of Residents Age 80+',
         name='Population 80+ (Census Tracts)',
         highlight=True
     ).add_to(m)
@@ -662,8 +675,8 @@ def create_interactive_map(merged_gdf, air_df, date_range, output_file="slc_anal
             'fillOpacity': 0.1
         },
         tooltip=GeoJsonTooltip(
-            fields=['NAMELSAD', 'pop_80_plus'],
-            aliases=['Census Tract:', 'Population 80+:'],
+            fields=['NAMELSAD', 'pop_80_plus_pct_formatted', 'pop_80_plus_formatted'],
+            aliases=['Census Tract:', 'Percentage 80+:', 'Population 80+ (Count):'],
             localize=True,
             sticky=True,
             labels=True,
