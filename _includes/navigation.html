@@ -1,0 +1,6 @@
+<ul>
+    <li><a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %}>Home</a></li>
+    <li><a href="{{ '/epa-analysis' | relative_url }}" {% if page.url == '/epa-analysis.html' or page.url == '/epa-analysis/' %}class="active"{% endif %}>EPA Analysis</a></li>
+    <li><a href="{{ '/purpleair-analysis' | relative_url }}" {% if page.url == '/purpleair-analysis.html' or page.url == '/purpleair-analysis/' %}class="active"{% endif %}>PurpleAir Analysis</a></li>
+</ul>
+
