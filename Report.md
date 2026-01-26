@@ -4,7 +4,6 @@
 
 ## 1. Project Overview
 
-### Research Question
 This project investigates the spatial correlation between vulnerable demographic groups (specifically residents aged 80+) and exposure to PM2.5 particulate matter in the Salt Lake and surrounding counties. 
 
 ### Study Area
@@ -85,16 +84,16 @@ This proof-of-concept demonstrates analysis capabilities with two independent ai
 - **Full Dataset Available:** 57,639 records (January 1 - December 31, 2025)
 
 **Monitoring Stations:**
-1. **Bountiful Viewmont** (Site 4) - Davis County
-2. **Copper View** (Site 2005) - Salt Lake County
-3. **Hawthorne** (Site 3006) - Salt Lake County
-4. **ROSE PARK** (Site 3010) - Salt Lake County
-5. **Herriman #3** (Site 3013) - Salt Lake County
-6. **Lake Park** (Site 3014) - Salt Lake County
-7. **Utah Technical Center** (Site 3015) - Salt Lake County
-8. **Inland Port** (Site 3016) - Salt Lake County
-9. **Red Butte** (Site 3018) - Salt Lake County
-10. **Near Road** (Site 4002) - Salt Lake County
+1. Bountiful Viewmont (Site 4) - Davis County
+2. Copper View (Site 2005) - Salt Lake County
+3. Hawthorne (Site 3006) - Salt Lake County
+4. ROSE PARK (Site 3010) - Salt Lake County
+5. Herriman #3 (Site 3013) - Salt Lake County
+6. Lake Park (Site 3014) - Salt Lake County
+7. Utah Technical Center (Site 3015) - Salt Lake County
+8. Inland Port (Site 3016) - Salt Lake County
+9. Red Butte (Site 3018) - Salt Lake County
+10. Near Road (Site 4002) - Salt Lake County
 
 **Data Quality:**
 - **Measurement Method:** FRM/FEM (Federal Reference/Equivalent Method)
@@ -150,7 +149,7 @@ This proof-of-concept demonstrates analysis capabilities with two independent ai
 - Potential data gaps if sensors go offline
 - Different temporal resolution (hourly) compared to EPA daily averages
 
-#### B.3. TRAX Mobile Sensor Data (Future Work)
+#### B.3. TRAX Mobile Sensor Data (Not Available)
 
 **Data Source:**
 - **Platform:** Synoptic Data API (U-ATAQ project)
@@ -162,13 +161,14 @@ This proof-of-concept demonstrates analysis capabilities with two independent ai
 - Continuous measurements along transit corridors
 - Represents real-world exposure for transit-dependent populations
 
-**Current Status:**
-- **Access Issue:** The website at https://atmos.utah.edu/air_quality/trax/ as noted by the paper (The TRAXLight-Rail Train Air Quality
-Observation Project
-Daniel L. Mendoza 1,2,* , Erik T. Crosman 3
-, Logan E. Mitchell 1
-Benjamin Fasoli 1, Andrew M. Park 1, John C. Lin 1
-, Alexander A) from the University of Utah Atmospheric Sciences Department is no longer accessible.
+**Access Status:**
+- **Data Source Unavailable:** The website at https://atmos.utah.edu/air_quality/trax/ referenced in the TRAX Light-Rail Train Air Quality Observation Project (Mendoza et al.) from the University of Utah Atmospheric Sciences Department is no longer accessible
+- **Attempted Access:** Attempted access during project development period but could not retrieve data as noted in the paper 
+The TRAX Light-Rail Train Air Quality Observation Project  
+Authors: Daniel L. Mendoza¹²*, Erik T. Crosman³, Logan E. Mitchell¹,  
+Benjamin Fasoli¹, Andrew M. Park¹, John C. Lin¹, Alexander A. Jacques¹,  
+and John D. Horel¹
+- **Analysis Status:** This data source was skipped for this analysis due to unavailability
 
 ---
 
@@ -418,11 +418,11 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 ### Short-Term Enhancements
 
 1. **Acquire TRAX Mobile Data:**
-   - Contact Synoptic Data support for Enterprise API access
-   - Alternative: Direct contact with University of Utah Atmospheric Sciences Department (U-ATAQ project)
-   - Goal: Obtain Red Line, Green Line, and Blue Line sensor data
+   - Contact University of Utah Atmospheric Sciences Department for alternative access to TRAX mobile data
+   - The original data portal (https://atmos.utah.edu/air_quality/trax/) is no longer accessible
+   - Goal: Obtain Red Line, Green Line, and Blue Line sensor data if alternative access becomes available
 
-2. **TRAX Visualization:**
+2. **TRAX Visualization (if data becomes available):**
    - Plot GPS path line showing PM2.5 variation
    - Explicitly visualize elevation gradient (University of Utah bench → I-15 valley floor)
    - Create animated time-series showing pollution accumulation during inversion events
