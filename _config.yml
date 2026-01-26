@@ -25,7 +25,7 @@ exclude:
   - .gitignore
   - Data/
   - __pycache__/
-  - *.py
+  - "*.py"
   - requirements.txt
   - calculate_statistics.py
   - descriptive_statistics.txt
