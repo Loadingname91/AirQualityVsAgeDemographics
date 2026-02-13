@@ -109,11 +109,17 @@ permalink: epa-analysis/
 - Panel 3: Time Series (Daily Average PM2.5 Over Time)
 - Panel 4: Summary Statistics Table
 
-### Interactive Web Map
+### Interactive Web Maps
 
-{% include interactive_map.html map_path="/assets/maps/epa_interactive_map.html" %}
+#### Population Age 65+ Map
 
-**Features:**
+{% include interactive_map.html map_path="/assets/maps/epa_interactive_map_65plus.html" %}
+
+#### Population Age 85+ Map
+
+{% include interactive_map.html map_path="/assets/maps/epa_interactive_map_85plus.html" %}
+
+
 - Choropleth layer for population demographics (toggleable)
 - Circle markers for EPA monitoring stations (color-coded by PM2.5 level)
 - Hover tooltips showing census tract information

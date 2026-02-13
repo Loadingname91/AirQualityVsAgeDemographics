@@ -139,11 +139,17 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 - Panel 3: Spatial Distribution (Latitude vs. Longitude colored by PM2.5)
 - Panel 4: Summary Statistics Table
 
-### Interactive Web Map
+### Interactive Web Maps
 
-{% include interactive_map.html map_path="/assets/maps/slc_analysis_interactive.html" %}
+#### Population Age 65+ Map
 
-**Features:**
+{% include interactive_map.html map_path="/assets/maps/slc_analysis_interactive_65plus.html" %}
+
+#### Population Age 85+ Map
+
+{% include interactive_map.html map_path="/assets/maps/slc_analysis_interactive_85plus.html" %}
+
+
 - Choropleth layer for population demographics (toggleable)
 - Circle markers for PurpleAir sensors (color-coded by PM2.5 level)
 - Hover tooltips showing census tract information
