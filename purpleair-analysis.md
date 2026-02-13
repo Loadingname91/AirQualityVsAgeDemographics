@@ -104,22 +104,28 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 ### Visualization Approach
 - **Method:** Continuous surface visualization via spatial interpolation
 - **Color Mapping:** OrRd colormap (yellow = low, red = high PM2.5)
-- **Demographic Context:** Side-by-side with census tract choropleth showing population 80+ distribution
-- **Output:** High-resolution static maps (300 DPI) and interactive web maps
+- **Demographic Context:** Side-by-side with census tract choropleth showing population distribution (separate maps for 65+ and 85+)
+- **Output:** High-resolution static maps (300 DPI) and interactive web maps for both age groups
 
 ---
 
 ## Deliverables
 
-### Static Visualization
+### Static Visualizations
 
-![PurpleAir Final Analysis Map]({{ '/assets/images/final_analysis_map.png' | relative_url }})
+#### Population Age 65+ Map
 
-**Layout:**
-1. **Left Panel:** Choropleth map of **Age 80+ Population Density**
+![PurpleAir Final Analysis Map - 65+]({{ '/assets/images/final_analysis_map_65plus.png' | relative_url }})
+
+#### Population Age 85+ Map
+
+![PurpleAir Final Analysis Map - 85+]({{ '/assets/images/final_analysis_map_85plus.png' | relative_url }})
+
+**Layout (for each age group):**
+1. **Left Panel:** Choropleth map of **Population Density**
    - Colormap: Blues (light = low, dark = high)
    - Clearly shows concentration of seniors on East Bench and specific valley neighborhoods
-   - Legend: Population count per census tract (1-548 residents aged 80+)
+   - Legend: Population percentage per census tract
 
 2. **Right Panel:** **PM2.5 Heatmap**
    - Interpolated surface from 254 PurpleAir sensors
@@ -127,7 +133,7 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
    - Sensor locations shown as black dots for transparency
    - Spatial interpolation enables continuous surface mapping
 
-**Purpose:** Demonstrate high-density sensor network capability for detailed neighborhood-level air quality visualization.
+**Purpose:** Demonstrate high-density sensor network capability for detailed neighborhood-level air quality visualization. Separate maps allow comparison between 65+ and 85+ population distributions and their spatial correlation with PM2.5 exposure patterns.
 
 ### Data Analysis Plots
 

@@ -1,11 +1,11 @@
-**Role:** You are an expert Python Data Scientist specializing in Geospatial Analysis (GIS). Your goal is to build a complete pipeline that visualizes the intersection of **Age Demographics (80+)** and **Air Quality (PM2.5)** in Salt Lake City.
+**Role:** You are an expert Python Data Scientist specializing in Geospatial Analysis (GIS). Your goal is to build a complete pipeline that visualizes the intersection of **Age Demographics (65+ and 85+)** and **Air Quality (PM2.5)** in Salt Lake City.
 
 **Project Context:**
 I have a dataset of Salt Lake City census tracts and a folder of raw air quality sensor logs. I need a Python script to:
 
-1. Map the density of the 80+ year old population.
+1. Map the density of the 65+ and 85+ year old populations (separate analyses).
 2. Create a continuous "Heatmap" surface of PM2.5 pollution from discrete sensor points.
-3. Overlay these two layers to visualize environmental inequity.
+3. Overlay these two layers to visualize environmental inequity for both age groups.
 
 **1. File Structure & Inputs**
 Assume the following directory structure. You must write code that correctly loads these paths all contained in the `Data` folder.
@@ -32,11 +32,9 @@ Assume the following directory structure. You must write code that correctly loa
 **Step B: Demographic Data (Census Cleaning)**
 
 * Load the ACS CSV. Note that row 2 usually contains descriptive headers; handle this.
-* **Feature Engineering:** Create a new column `pop_80_plus` by summing:
-* Male: 80-84 years + 85 years and over
-* Female: 80-84 years + 85 years and over
-
-
+* **Feature Engineering:** Create columns for both age groups:
+  * `pop_65_plus`: Sum of 12 ACS columns (Male: 65-66, 67-69, 70-74, 75-79, 80-84, 85+; Female: 65-66, 67-69, 70-74, 75-79, 80-84, 85+)
+  * `pop_85_plus`: Sum of 2 ACS columns (Male: 85+; Female: 85+)
 * **Join Key Fix:** The ACS `GEO_ID` column often has a prefix (e.g., `1400000US49035...`). Strip `1400000US` so it matches the Shapefile `GEOID`.
 * **Merge:** Inner join the Shapefile and Census Data.
 

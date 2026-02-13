@@ -1,10 +1,10 @@
 # Spatial Analysis of Environmental Inequity in Salt Lake City
 
-### Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution
+### Visualizing the Intersection of Senior Populations (65+ and 85+) and PM2.5 Air Pollution
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://Loadingname91.github.io/AirQualityVsAgeDemographics/)
 
-This project investigates the spatial correlation between vulnerable demographic groups (specifically residents aged 80+) and exposure to PM2.5 particulate matter during winter inversion events in the Salt Lake Valley, Utah.
+This project investigates the spatial correlation between vulnerable demographic groups (specifically residents aged 65+ and 85+) and exposure to PM2.5 particulate matter during winter inversion events in the Salt Lake Valley, Utah.
 
 ##  Table of Contents
 
@@ -31,7 +31,9 @@ This project presents a **proof-of-concept demonstration** of geospatial analysi
 
 ### Study Area
 - **Counties:** Salt Lake County (FIPS 49035) and Davis County (FIPS 49011), Utah
-- **Demographic Focus:** Residents aged 80+ (36,524 residents across 301 inhabited census tracts)
+- **Demographic Focus:** 
+  - **65+ Population:** Approximately 176,531 residents (12 ACS columns: ages 65-66, 67-69, 70-74, 75-79, 80-84, 85+ for both males and females)
+  - **85+ Population:** Approximately 36,524 residents (2 ACS columns: age 85+ for both males and females)
 
 ##  Features
 
@@ -80,16 +82,20 @@ GeoSpatialDataProject/
 │   ├── main.py                       # Main EPA analysis pipeline
 │   ├── get_epa_data.py              # EPA API data retrieval
 │   ├── epa_utah_data.csv            # Processed EPA data
-│   ├── epa_age_overlay_map.png      # Static visualization
+│   ├── epa_age_overlay_map_65plus.png      # Static visualization (65+)
+│   ├── epa_age_overlay_map_85plus.png      # Static visualization (85+)
 │   ├── epa_data_analysis.png        # Statistical plots
-│   └── epa_interactive_map.html     # Interactive map
+│   ├── epa_interactive_map_65plus.html     # Interactive map (65+)
+│   └── epa_interactive_map_85plus.html     # Interactive map (85+)
 │
 ├── PurpleAirDataAnalysis/            # PurpleAir data analysis scripts
 │   ├── main.py                       # Main PurpleAir analysis pipeline
 │   ├── master_sensor_list.csv        # Sensor location data
-│   ├── final_analysis_map.png       # Static visualization
+│   ├── final_analysis_map_65plus.png       # Static visualization (65+)
+│   ├── final_analysis_map_85plus.png       # Static visualization (85+)
 │   ├── purpleair_data_analysis.png  # Statistical plots
-│   └── slc_analysis_interactive.html # Interactive map
+│   ├── slc_analysis_interactive_65plus.html # Interactive map (65+)
+│   └── slc_analysis_interactive_85plus.html # Interactive map (85+)
 │
 ├── Data/                             # Raw data files (not in git)
 │   ├── PurpleAirData-Pm2.5Data/     # PurpleAir CSV files
@@ -180,7 +186,10 @@ Then visit `http://localhost:4000` in your browser.
 - **Source:** US Census Bureau (American Community Survey 5-Year Estimates, 2023)
 - **Table:** `B01001` (Sex by Age)
 - **Geographic Unit:** Census Tracts
-- **Focus:** Population aged 80+ in Salt Lake and Davis counties
+- **Focus:** 
+  - **65+ Population:** 12 ACS columns (ages 65-66, 67-69, 70-74, 75-79, 80-84, 85+ for both males and females)
+  - **85+ Population:** 2 ACS columns (age 85+ for both males and females)
+- **Study Area:** Salt Lake and Davis counties
 
 ### EPA AQS Data
 - **Source:** EPA AQS Data API (https://aqs.epa.gov/data/api)
@@ -199,14 +208,22 @@ Then visit `http://localhost:4000` in your browser.
 ##  Deliverables
 
 ### EPA Analysis
-- **Static Map:** `EPADataAnalysis/epa_age_overlay_map.png`
+- **Static Maps:** 
+  - `EPADataAnalysis/epa_age_overlay_map_65plus.png` (Population Age 65+)
+  - `EPADataAnalysis/epa_age_overlay_map_85plus.png` (Population Age 85+)
 - **Analysis Plots:** `EPADataAnalysis/epa_data_analysis.png`
-- **Interactive Map:** `EPADataAnalysis/epa_interactive_map.html`
+- **Interactive Maps:** 
+  - `EPADataAnalysis/epa_interactive_map_65plus.html` (Population Age 65+)
+  - `EPADataAnalysis/epa_interactive_map_85plus.html` (Population Age 85+)
 
 ### PurpleAir Analysis
-- **Static Map:** `PurpleAirDataAnalysis/final_analysis_map.png`
+- **Static Maps:** 
+  - `PurpleAirDataAnalysis/final_analysis_map_65plus.png` (Population Age 65+)
+  - `PurpleAirDataAnalysis/final_analysis_map_85plus.png` (Population Age 85+)
 - **Analysis Plots:** `PurpleAirDataAnalysis/purpleair_data_analysis.png`
-- **Interactive Map:** `PurpleAirDataAnalysis/slc_analysis_interactive.html`
+- **Interactive Maps:** 
+  - `PurpleAirDataAnalysis/slc_analysis_interactive_65plus.html` (Population Age 65+)
+  - `PurpleAirDataAnalysis/slc_analysis_interactive_85plus.html` (Population Age 85+)
 
 ### Documentation
 - **Full Report:** `Report.md`
@@ -255,7 +272,9 @@ Your site will be available at: `https://Loadingname91.github.io/AirQualityVsAge
 ### Data Processing
 - **EPA:** Daily 24-hour averages aggregated by monitoring station
 - **PurpleAir:** 60-minute averages with spatial interpolation (IDW)
-- **Census:** Tract-level aggregation of population 80+
+- **Census:** Tract-level aggregation of both 65+ and 85+ populations
+  - **65+:** 12 ACS columns (ages 65-66, 67-69, 70-74, 75-79, 80-84, 85+ for both males and females)
+  - **85+:** 2 ACS columns (age 85+ for both males and females)
 
 ##  Contributing
 

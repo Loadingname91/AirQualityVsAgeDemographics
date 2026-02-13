@@ -78,26 +78,32 @@ permalink: epa-analysis/
 ### Visualization Approach
 - **Method:** Point-based visualization with monitoring stations as discrete locations
 - **Color Coding:** Stations color-coded by PM2.5 value using YlOrRd colormap
-- **Demographic Context:** Overlaid on census tract choropleth showing population 80+ distribution
-- **Output:** High-resolution static maps (300 DPI) and interactive web maps
+- **Demographic Context:** Overlaid on census tract choropleth showing population distribution (separate maps for 65+ and 85+)
+- **Output:** High-resolution static maps (300 DPI) and interactive web maps for both age groups
 
 ---
 
 ## Deliverables
 
-### Static Visualization
+### Static Visualizations
 
-![EPA Age Overlay Map]({{ '/assets/images/epa_age_overlay_map.png' | relative_url }})
+#### Population Age 65+ Map
 
-**Layout:**
+![EPA Age Overlay Map - 65+]({{ '/assets/images/epa_age_overlay_map_65plus.png' | relative_url }})
+
+#### Population Age 85+ Map
+
+![EPA Age Overlay Map - 85+]({{ '/assets/images/epa_age_overlay_map_85plus.png' | relative_url }})
+
+**Layout (for each age group):**
 - **Single Combined Map:**
-  - **Background Layer:** Census tracts colored by 80+ population (Blues colormap)
+  - **Background Layer:** Census tracts colored by population percentage (Blues colormap)
   - **Overlay Layer:** EPA monitoring stations as large scatter points
     - Color-coded by PM2.5 value (YlOrRd colormap)
     - Black edges for visibility
     - Labeled with station names
 
-**Purpose:** Focus on official regulatory data with demographic context, using point-based visualization without interpolation assumptions.
+**Purpose:** Focus on official regulatory data with demographic context, using point-based visualization without interpolation assumptions. Separate maps allow comparison between 65+ and 85+ population distributions and their spatial correlation with PM2.5 exposure.
 
 ### Data Analysis Plots
 
@@ -153,7 +159,8 @@ permalink: epa-analysis/
 ### Preliminary Observations
 - Regulatory-grade data provides reliable point measurements but limited spatial coverage
 - Site-level differences suggest elevation and proximity to traffic sources influence PM2.5 concentrations
-- Further analysis needed to quantify correlation between elderly population density and PM2.5 exposure at monitoring station locations
+- Comparison of 65+ and 85+ population distributions reveals spatial patterns in vulnerable demographic exposure
+- Further analysis needed to quantify correlation between elderly population density (both 65+ and 85+) and PM2.5 exposure at monitoring station locations
 
 ---
 

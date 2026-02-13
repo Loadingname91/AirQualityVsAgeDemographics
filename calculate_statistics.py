@@ -169,13 +169,21 @@ print("=" * 60)
 census_path = "Data/ACSData/ACSDT5Y2023.B01001-Data.csv"
 df_census = pd.read_csv(census_path, skiprows=[1], low_memory=False)
 
-# Columns for 65+ population (Male 65-85+, Female 65-85+)
-age_columns = ['B01001_020E', 'B01001_021E', 'B01001_022E', 'B01001_023E', 'B01001_024E', 'B01001_025E',
-               'B01001_044E', 'B01001_045E', 'B01001_046E', 'B01001_047E', 'B01001_048E', 'B01001_049E']
-for col in age_columns:
+# Columns for 65+ population (12 columns: Male 65-85+, Female 65-85+)
+age_65_plus_columns = ['B01001_020E', 'B01001_021E', 'B01001_022E', 'B01001_023E', 'B01001_024E', 'B01001_025E',
+                       'B01001_044E', 'B01001_045E', 'B01001_046E', 'B01001_047E', 'B01001_048E', 'B01001_049E']
+
+# Columns for 85+ population (2 columns: Male 85+, Female 85+)
+age_85_plus_columns = ['B01001_025E', 'B01001_049E']
+
+# Convert all columns to numeric
+all_age_columns = age_65_plus_columns + age_85_plus_columns
+for col in all_age_columns:
     df_census[col] = pd.to_numeric(df_census[col], errors='coerce').fillna(0)
 
-df_census['pop_65_plus'] = df_census[age_columns].sum(axis=1)
+# Calculate both age groups
+df_census['pop_65_plus'] = df_census[age_65_plus_columns].sum(axis=1)
+df_census['pop_85_plus'] = df_census[age_85_plus_columns].sum(axis=1)
 df_census['GEOID'] = df_census['GEO_ID'].str.replace('1400000US', '', regex=False)
 
 # Filter to Salt Lake and Davis counties
@@ -183,33 +191,59 @@ salt_lake_mask = df_census['GEOID'].str.startswith('49035')
 davis_mask = df_census['GEOID'].str.startswith('49011')
 study_area = df_census[salt_lake_mask | davis_mask].copy()
 
-# Filter to inhabited tracts
-inhabited = study_area[study_area['pop_80_plus'] > 0].copy()
+# Filter to inhabited tracts (using 65+ as it's more inclusive)
+inhabited = study_area[study_area['pop_65_plus'] > 0].copy()
 
-print("\n1. Population 80+ Summary:")
+print("\n1. Population 65+ Summary:")
 print(f"   Total Tracts in Study Area: {len(study_area)}")
-print(f"   Inhabited Tracts (pop_80+ > 0): {len(inhabited)}")
-print(f"   Total 80+ Population: {inhabited['pop_80_plus'].sum():,.0f}")
+print(f"   Inhabited Tracts (pop_65+ > 0): {len(inhabited)}")
+print(f"   Total 65+ Population: {inhabited['pop_65_plus'].sum():,.0f}")
 
-print("\n2. Tract-Level Distribution:")
-stats_tract = inhabited['pop_80_plus'].describe()
-print(f"   Mean per Tract: {stats_tract['mean']:.1f}")
-print(f"   Median per Tract: {stats_tract['50%']:.1f}")
-print(f"   Std Dev: {stats_tract['std']:.1f}")
-print(f"   Min: {stats_tract['min']:.0f}")
-print(f"   Max: {stats_tract['max']:.0f}")
-print(f"   25th Percentile: {stats_tract['25%']:.1f}")
-print(f"   75th Percentile: {stats_tract['75%']:.1f}")
+print("\n2. Population 65+ Tract-Level Distribution:")
+stats_tract_65 = inhabited['pop_65_plus'].describe()
+print(f"   Mean per Tract: {stats_tract_65['mean']:.1f}")
+print(f"   Median per Tract: {stats_tract_65['50%']:.1f}")
+print(f"   Std Dev: {stats_tract_65['std']:.1f}")
+print(f"   Min: {stats_tract_65['min']:.0f}")
+print(f"   Max: {stats_tract_65['max']:.0f}")
+print(f"   25th Percentile: {stats_tract_65['25%']:.1f}")
+print(f"   75th Percentile: {stats_tract_65['75%']:.1f}")
 
-print("\n3. Population Distribution by County:")
-salt_lake_tracts = inhabited[inhabited['GEOID'].str.startswith('49035')]
-davis_tracts = inhabited[inhabited['GEOID'].str.startswith('49011')]
+print("\n3. Population 65+ Distribution by County:")
+salt_lake_tracts_65 = inhabited[inhabited['GEOID'].str.startswith('49035')]
+davis_tracts_65 = inhabited[inhabited['GEOID'].str.startswith('49011')]
 print(f"   Salt Lake County:")
-print(f"     Tracts: {len(salt_lake_tracts)}")
-print(f"     Total 80+ Population: {salt_lake_tracts['pop_80_plus'].sum():,.0f}")
+print(f"     Tracts: {len(salt_lake_tracts_65)}")
+print(f"     Total 65+ Population: {salt_lake_tracts_65['pop_65_plus'].sum():,.0f}")
 print(f"   Davis County:")
-print(f"     Tracts: {len(davis_tracts)}")
-print(f"     Total 80+ Population: {davis_tracts['pop_80_plus'].sum():,.0f}")
+print(f"     Tracts: {len(davis_tracts_65)}")
+print(f"     Total 65+ Population: {davis_tracts_65['pop_65_plus'].sum():,.0f}")
+
+print("\n" + "-" * 60)
+print("\n4. Population 85+ Summary:")
+print(f"   Total Tracts in Study Area: {len(study_area)}")
+print(f"   Inhabited Tracts (pop_65+ > 0): {len(inhabited)}")
+print(f"   Total 85+ Population: {inhabited['pop_85_plus'].sum():,.0f}")
+
+print("\n5. Population 85+ Tract-Level Distribution:")
+stats_tract_85 = inhabited['pop_85_plus'].describe()
+print(f"   Mean per Tract: {stats_tract_85['mean']:.1f}")
+print(f"   Median per Tract: {stats_tract_85['50%']:.1f}")
+print(f"   Std Dev: {stats_tract_85['std']:.1f}")
+print(f"   Min: {stats_tract_85['min']:.0f}")
+print(f"   Max: {stats_tract_85['max']:.0f}")
+print(f"   25th Percentile: {stats_tract_85['25%']:.1f}")
+print(f"   75th Percentile: {stats_tract_85['75%']:.1f}")
+
+print("\n6. Population 85+ Distribution by County:")
+salt_lake_tracts_85 = inhabited[inhabited['GEOID'].str.startswith('49035')]
+davis_tracts_85 = inhabited[inhabited['GEOID'].str.startswith('49011')]
+print(f"   Salt Lake County:")
+print(f"     Tracts: {len(salt_lake_tracts_85)}")
+print(f"     Total 85+ Population: {salt_lake_tracts_85['pop_85_plus'].sum():,.0f}")
+print(f"   Davis County:")
+print(f"     Tracts: {len(davis_tracts_85)}")
+print(f"     Total 85+ Population: {davis_tracts_85['pop_85_plus'].sum():,.0f}")
 
 print("\n" + "=" * 60)
 print("Statistics Calculation Complete")

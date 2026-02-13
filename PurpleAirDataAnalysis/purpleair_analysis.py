@@ -1,6 +1,6 @@
 """
 PurpleAir PM2.5 Analysis Script
-Analyzes PM2.5 data from PurpleAir sensors alongside 80+ population demographics.
+Analyzes PM2.5 data from PurpleAir sensors alongside 65+ and 85+ population demographics.
 
 This script uses the reusable lib/ modules and adds PurpleAir-specific data loading.
 """

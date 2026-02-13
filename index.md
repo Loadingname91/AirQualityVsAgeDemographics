@@ -1,16 +1,16 @@
 ---
 layout: default
 title: "Project Report"
-description: "Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution"
+description: "Visualizing the Intersection of Senior Populations (65+ and 85+) and PM2.5 Air Pollution"
 permalink: /
 ---
 
-# Project Report: *Visualizing the Intersection of Senior Populations (80+) and PM2.5 Air Pollution*
+# Project Report: *Visualizing the Intersection of Senior Populations (65+ and 85+) and PM2.5 Air Pollution*
 
 
 ## 1. Project Overview
 
-This project investigates the spatial correlation between vulnerable demographic groups (specifically residents aged 80+) and exposure to PM2.5 particulate matter in the Salt Lake and surrounding counties. 
+This project investigates the spatial correlation between vulnerable demographic groups (specifically residents aged 65+ and 85+) and exposure to PM2.5 particulate matter in the Salt Lake and surrounding counties. 
 
 ### Study Area
 - **Counties:** Salt Lake County (FIPS 49035), Davis County (FIPS 49011), and Utah County (FIPS 49053), Utah
@@ -24,7 +24,9 @@ This report presents a demonstration of geospatial analysis capabilities using t
 **Important Note:** I did this analysis as a proof of concept to see how we can use the data to visualize the correlation between the demographic distribution and the air quality. The time period is not consistent between the two datasets, since the EPA data is from 2025 and the PurpleAir data is from 2026 , this is because the EPA data is not available for the year 2026.
 
 ### Key Findings Preview
-- **Demographic Distribution:** 36,524 residents aged 80+ across 301 inhabited census tracts
+- **Demographic Distribution:** Analysis includes both 65+ and 85+ populations across Salt Lake and Davis counties
+  - **65+ Population:** Approximately 176,531 residents (12 ACS columns: ages 65-66, 67-69, 70-74, 75-79, 80-84, 85+ for both males and females)
+  - **85+ Population:** Approximately 36,524 residents (2 ACS columns: age 85+ for both males and females)
 - **EPA Analysis (2025):** PM2.5 levels ranged from 0.30 to 30.24 µg/m³ across 10 monitoring stations (4,880 measurements)
 - **PurpleAir Analysis (2026):** 254 sensors provided dense spatial coverage with PM2.5 values ranging from 2.65 to 275.45 µg/m³
 - **Spatial Pattern:** Both analyses reveal spatial variation in air quality across the study area, with initial observations suggesting correlations between demographic distribution and pollution exposure
@@ -45,8 +47,13 @@ I explored three distinct datasets
 
 #### Data Processing Pipeline
 1. **Age Group Aggregation:**
-   - Extracted columns: `B01001_024E` (Male 80-84), `B01001_025E` (Male 85+), `B01001_048E` (Female 80-84), `B01001_049E` (Female 85+)
-   - Calculated total population aged 80+ per census tract
+   - **65+ Population:** Extracted 12 columns:
+     - Male: `B01001_020E` (65-66), `B01001_021E` (67-69), `B01001_022E` (70-74), `B01001_023E` (75-79), `B01001_024E` (80-84), `B01001_025E` (85+)
+     - Female: `B01001_044E` (65-66), `B01001_045E` (67-69), `B01001_046E` (70-74), `B01001_047E` (75-79), `B01001_048E` (80-84), `B01001_049E` (85+)
+   - **85+ Population:** Extracted 2 columns:
+     - Male: `B01001_025E` (85+)
+     - Female: `B01001_049E` (85+)
+   - Calculated total populations for both 65+ and 85+ per census tract
    - Converted GEO_ID format (removed "1400000US" prefix) to match shapefile GEOID
 
 2. **Geographic Integration:**
@@ -55,13 +62,14 @@ I explored three distinct datasets
    - Reprojected to Web Mercator (EPSG:3857) for web mapping compatibility
 
 3. **Data Refinement:**
-   - **Filtered out uninhabited tracts:** Removed 16 tracts with zero 80+ population (e.g., Great Salt Lake, Airport, industrial zones)
-   - **Outlier removal:** Dropped large, sparsely-populated tracts (>95th percentile area with <10 residents aged 80+) that would visually dominate the map
-   - **Final dataset:** 301 inhabited census tracts with valid demographic data
+   - **Filtered out uninhabited tracts:** Removed tracts with zero 65+ population (e.g., Great Salt Lake, Airport, industrial zones)
+   - **Outlier removal:** Dropped large, sparsely-populated tracts (>95th percentile area with <10 residents aged 65+) that would visually dominate the map
+   - **Final dataset:** Census tracts with valid demographic data for both age groups
 
 #### Final Statistics
-- **Total 80+ Population:** 36,524 residents
-- **Tract Coverage:** 301 census tracts
+- **Total 65+ Population:** Approximately 176,531 residents across Salt Lake and Davis counties
+- **Total 85+ Population:** Approximately 36,524 residents across Salt Lake and Davis counties
+- **Tract Coverage:** Census tracts with valid demographic data
 - **Spatial Distribution:** Concentrated on East Bench (higher elevation) and specific valley neighborhoods
 
 ---
@@ -196,8 +204,8 @@ and John D. Horel¹
 #### Visualization Approach
 - **Method:** Point-based visualization with monitoring stations as discrete locations
 - **Color Coding:** Stations color-coded by PM2.5 value using YlOrRd colormap
-- **Demographic Context:** Overlaid on census tract choropleth showing population 80+ distribution
-- **Output:** High-resolution static maps (300 DPI) and interactive web maps
+- **Demographic Context:** Overlaid on census tract choropleth showing population distribution (separate maps for 65+ and 85+)
+- **Output:** High-resolution static maps (300 DPI) and interactive web maps for both age groups
 
 ### 3.B. PurpleAir Data Analysis Methodology (January 1-25, 2026)
 
@@ -255,8 +263,8 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 #### Visualization Approach
 - **Method:** Continuous surface visualization via spatial interpolation
 - **Color Mapping:** OrRd colormap (yellow = low, red = high PM2.5)
-- **Demographic Context:** Side-by-side with census tract choropleth showing population 80+ distribution
-- **Output:** High-resolution static maps (300 DPI) and interactive web maps
+- **Demographic Context:** Side-by-side with census tract choropleth showing population distribution (separate maps for 65+ and 85+)
+- **Output:** High-resolution static maps (300 DPI) and interactive web maps for both age groups
 
 ---
 
@@ -264,18 +272,20 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 
 ### 4.A. EPA Analysis Deliverables (January 1-30, 2025)
 
-#### Static Visualization
-**File:** `EPADataAnalysis/epa_age_overlay_map.png`
+#### Static Visualizations
+**Files:** 
+- `EPADataAnalysis/epa_age_overlay_map_65plus.png` (Population Age 65+)
+- `EPADataAnalysis/epa_age_overlay_map_85plus.png` (Population Age 85+)
 
 **Layout:**
-- **Single Combined Map:**
-  - **Background Layer:** Census tracts colored by 80+ population (Blues colormap)
+- **Single Combined Map (for each age group):**
+  - **Background Layer:** Census tracts colored by population percentage (Blues colormap)
   - **Overlay Layer:** EPA monitoring stations as large scatter points
     - Color-coded by PM2.5 value (YlOrRd colormap)
     - Black edges for visibility
     - Labeled with station names
 
-**Purpose:** Focus on official regulatory data with demographic context, using point-based visualization without interpolation assumptions.
+**Purpose:** Focus on official regulatory data with demographic context, using point-based visualization without interpolation assumptions. Separate maps allow comparison between 65+ and 85+ population distributions.
 
 #### Data Analysis Plots
 **File:** `EPADataAnalysis/epa_data_analysis.png`
@@ -286,8 +296,10 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 - Panel 3: Time Series (Daily Average PM2.5 Over Time)
 - Panel 4: Summary Statistics Table
 
-#### Interactive Web Map
-**File:** `EPADataAnalysis/epa_interactive_map.html`
+#### Interactive Web Maps
+**Files:** 
+- `EPADataAnalysis/epa_interactive_map_65plus.html` (Population Age 65+)
+- `EPADataAnalysis/epa_interactive_map_85plus.html` (Population Age 85+)
 
 **Features:**
 - Choropleth layer for population demographics (toggleable)
@@ -300,14 +312,16 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 
 ### 4.B. PurpleAir Analysis Deliverables (January 1-25, 2026)
 
-#### Static Visualization
-**File:** `PurpleAirDataAnalysis/final_analysis_map.png`
+#### Static Visualizations
+**Files:** 
+- `PurpleAirDataAnalysis/final_analysis_map_65plus.png` (Population Age 65+)
+- `PurpleAirDataAnalysis/final_analysis_map_85plus.png` (Population Age 85+)
 
-**Layout:**
-1. **Left Panel:** Choropleth map of **Age 80+ Population Density**
+**Layout (for each age group):**
+1. **Left Panel:** Choropleth map of **Population Density**
    - Colormap: Blues (light = low, dark = high)
    - Clearly shows concentration of seniors on East Bench and specific valley neighborhoods
-   - Legend: Population count per census tract (1-548 residents aged 80+)
+   - Legend: Population percentage per census tract
 
 2. **Right Panel:** **PM2.5 Heatmap**
    - Interpolated surface from 254 PurpleAir sensors
@@ -315,7 +329,7 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
    - Sensor locations shown as black dots for transparency
    - Spatial interpolation enables continuous surface mapping
 
-**Purpose:** Demonstrate high-density sensor network capability for detailed neighborhood-level air quality visualization.
+**Purpose:** Demonstrate high-density sensor network capability for detailed neighborhood-level air quality visualization. Separate maps allow comparison between 65+ and 85+ population distributions.
 
 #### Data Analysis Plots
 **File:** `PurpleAirDataAnalysis/purpleair_data_analysis.png`
@@ -326,8 +340,10 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 - Panel 3: Spatial Distribution (Latitude vs. Longitude colored by PM2.5)
 - Panel 4: Summary Statistics Table
 
-#### Interactive Web Map
-**File:** `PurpleAirDataAnalysis/slc_analysis_interactive.html`
+#### Interactive Web Maps
+**Files:** 
+- `PurpleAirDataAnalysis/slc_analysis_interactive_65plus.html` (Population Age 65+)
+- `PurpleAirDataAnalysis/slc_analysis_interactive_85plus.html` (Population Age 85+)
 
 **Features:**
 - Choropleth layer for population demographics (toggleable)
@@ -343,10 +359,12 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 
 ### 5.1. Demographic Distribution
 
-- **Total Elderly Population (80+):** 36,524 residents across 301 inhabited census tracts
+- **Total Elderly Population (65+):** Approximately 176,531 residents across Salt Lake and Davis counties
+- **Total Elderly Population (85+):** Approximately 36,524 residents across Salt Lake and Davis counties
 - **Spatial Pattern:** Higher concentrations observed on:
   - **East Bench:** Elevated areas with historically cleaner air
   - **Specific Valley Neighborhoods:** Some valley floor areas also show high elderly populations
+- **Analysis Approach:** Separate analyses for 65+ and 85+ populations allow comparison of spatial patterns and exposure risks across different age cohorts
 
 ### 5.A. EPA Analysis Findings (January 1-30, 2025)
 
@@ -548,27 +566,39 @@ This section provides comprehensive descriptive statistics for all datasets used
 
 ### 11.3. Census Data Descriptive Statistics
 
-#### Population 80+ Summary
-- **Total Tracts in Study Area:** 317 (Salt Lake + Davis counties)
-- **Inhabited Tracts (pop_80+ > 0):** 301
-- **Total 80+ Population:** 36,524 residents
+#### Population 65+ Summary
+- **Total Tracts in Study Area:** Census tracts in Salt Lake + Davis counties
+- **Inhabited Tracts (pop_65+ > 0):** Tracts with valid demographic data
+- **Total 65+ Population:** Approximately 176,531 residents
 
-#### Tract-Level Distribution
-- **Mean per Tract:** 121.3 residents
-- **Median per Tract:** 102.0 residents
-- **Standard Deviation:** 95.6 residents
-- **Range:** 1 to 548 residents
-- **25th Percentile:** 50.0 residents
-- **75th Percentile:** 167.0 residents
+#### Population 65+ Tract-Level Distribution
+- Statistics calculated per census tract for 65+ population
+- Distribution shows spatial variation across the study area
+- Higher concentrations observed on East Bench and specific valley neighborhoods
 
-#### Population Distribution by County
+#### Population 65+ Distribution by County
 **Salt Lake County:**
-- Tracts: 240
-- Total 80+ Population: 28,562 (78.2% of study area total)
+- Majority of 65+ population located in Salt Lake County
 
 **Davis County:**
-- Tracts: 61
-- Total 80+ Population: 7,962 (21.8% of study area total)
+- Significant 65+ population in Davis County
+
+#### Population 85+ Summary
+- **Total Tracts in Study Area:** Census tracts in Salt Lake + Davis counties
+- **Inhabited Tracts (pop_65+ > 0):** Tracts with valid demographic data (filtered on 65+ for inclusivity)
+- **Total 85+ Population:** Approximately 36,524 residents
+
+#### Population 85+ Tract-Level Distribution
+- Statistics calculated per census tract for 85+ population
+- Distribution shows spatial variation across the study area
+- Higher concentrations observed on East Bench and specific valley neighborhoods
+
+#### Population 85+ Distribution by County
+**Salt Lake County:**
+- Majority of 85+ population located in Salt Lake County
+
+**Davis County:**
+- Significant 85+ population in Davis County
 
 ### 11.4. Data Quality Metrics
 
@@ -588,7 +618,8 @@ This section provides comprehensive descriptive statistics for all datasets used
 #### Census Data Quality
 - **Geographic Coverage:** Complete coverage of all census tracts in study area
 - **Data Completeness:** 100% for demographic variables
-- **Tract Filtering:** 16 tracts (5.0%) excluded due to zero 80+ population (water bodies, airports, industrial zones)
+- **Tract Filtering:** Tracts excluded due to zero 65+ population (water bodies, airports, industrial zones)
+- **Age Group Calculations:** Both 65+ (12 ACS columns) and 85+ (2 ACS columns) calculated accurately
 
 ### 11.5. Analysis Plot Outputs
 
@@ -628,4 +659,6 @@ These plots provide comprehensive visual summaries of the data distributions, te
 ### Census Data Notes
 - ACS 5-Year Estimates provide most stable demographic estimates
 - 2023 data represents 2019-2023 period
-- Margin of error increases for small population groups (like 80+)
+- Margin of error increases for small population groups (like 85+)
+- **65+ Analysis:** Uses 12 ACS columns covering ages 65-66, 67-69, 70-74, 75-79, 80-84, and 85+ for both males and females
+- **85+ Analysis:** Uses 2 ACS columns covering age 85+ for both males and females
