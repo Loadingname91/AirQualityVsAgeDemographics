@@ -169,11 +169,13 @@ print("=" * 60)
 census_path = "Data/ACSData/ACSDT5Y2023.B01001-Data.csv"
 df_census = pd.read_csv(census_path, skiprows=[1], low_memory=False)
 
-age_columns = ['B01001_024E', 'B01001_025E', 'B01001_048E', 'B01001_049E']
+# Columns for 65+ population (Male 65-85+, Female 65-85+)
+age_columns = ['B01001_020E', 'B01001_021E', 'B01001_022E', 'B01001_023E', 'B01001_024E', 'B01001_025E',
+               'B01001_044E', 'B01001_045E', 'B01001_046E', 'B01001_047E', 'B01001_048E', 'B01001_049E']
 for col in age_columns:
     df_census[col] = pd.to_numeric(df_census[col], errors='coerce').fillna(0)
 
-df_census['pop_80_plus'] = df_census[age_columns].sum(axis=1)
+df_census['pop_65_plus'] = df_census[age_columns].sum(axis=1)
 df_census['GEOID'] = df_census['GEO_ID'].str.replace('1400000US', '', regex=False)
 
 # Filter to Salt Lake and Davis counties

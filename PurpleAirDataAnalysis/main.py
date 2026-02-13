@@ -1,10 +1,12 @@
 """
-PM2.5 and Elderly Population (80+) Geospatial Analysis Pipeline
+PM2.5 and Elderly Population (65+ and 85+) Geospatial Analysis Pipeline
 Salt Lake County and Davis County, Utah
 
-This script creates a layered visualization combining:
-1. Census tract boundaries with 80+ age demographic data
+This script creates layered visualizations combining:
+1. Census tract boundaries with 65+ and 85+ age demographic data
 2. Interpolated PM2.5 heatmap from PurpleAir sensors
+
+Generates separate maps for both 65+ and 85+ populations.
 """
 
 import os
@@ -65,8 +67,8 @@ def load_and_filter_shapefile(shapefile_path):
 # =============================================================================
 def process_census_data(census_path):
     """
-    Load ACS demographic data and calculate population 80+.
-    Returns DataFrame with cleaned GEO_ID, pop_80_plus (raw count), and pop_80_plus_pct (percentage).
+    Load ACS demographic data and calculate both 65+ and 85+ populations.
+    Returns DataFrame with cleaned GEO_ID, pop_65_plus, pop_65_plus_pct, pop_85_plus, pop_85_plus_pct.
     """
     print("\nStep B: Processing census demographic data...")
     
@@ -74,37 +76,50 @@ def process_census_data(census_path):
     # Row 1 has column codes, row 2 has descriptions, data starts at row 3
     df = pd.read_csv(census_path, skiprows=[1], low_memory=False)
     
-    # Columns for 80+ population:
-    # B01001_024E: Male 80-84 years
-    # B01001_025E: Male 85+ years
-    # B01001_048E: Female 80-84 years
-    # B01001_049E: Female 85+ years
+    # Columns for 65+ population (12 columns total):
+    # Male: B01001_020E (65-66), B01001_021E (67-69), B01001_022E (70-74), 
+    #       B01001_023E (75-79), B01001_024E (80-84), B01001_025E (85+)
+    # Female: B01001_044E (65-66), B01001_045E (67-69), B01001_046E (70-74),
+    #         B01001_047E (75-79), B01001_048E (80-84), B01001_049E (85+)
+    age_65_plus_columns = ['B01001_020E', 'B01001_021E', 'B01001_022E', 'B01001_023E', 
+                           'B01001_024E', 'B01001_025E', 'B01001_044E', 'B01001_045E', 
+                           'B01001_046E', 'B01001_047E', 'B01001_048E', 'B01001_049E']
     
-    age_columns = ['B01001_024E', 'B01001_025E', 'B01001_048E', 'B01001_049E']
+    # Columns for 85+ population (2 columns):
+    # B01001_025E: Male 85+ years
+    # B01001_049E: Female 85+ years
+    age_85_plus_columns = ['B01001_025E', 'B01001_049E']
     
     # Convert to numeric (some values might be strings or have annotations)
-    for col in age_columns:
+    all_age_columns = age_65_plus_columns + age_85_plus_columns
+    for col in all_age_columns:
         df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
     
-    # Calculate total 80+ population
-    df['pop_80_plus'] = df[age_columns].sum(axis=1)
+    # Calculate total 65+ population
+    df['pop_65_plus'] = df[age_65_plus_columns].sum(axis=1)
+    
+    # Calculate total 85+ population
+    df['pop_85_plus'] = df[age_85_plus_columns].sum(axis=1)
     
     # Get total population (B01001_001E is the total population column)
     df['total_pop'] = pd.to_numeric(df['B01001_001E'], errors='coerce').fillna(0)
     
-    # Calculate percentage of population 80+
+    # Calculate percentages
     # Avoid division by zero by replacing 0 with 1
-    df['pop_80_plus_pct'] = (df['pop_80_plus'] / df['total_pop'].replace(0, 1)) * 100
+    df['pop_65_plus_pct'] = (df['pop_65_plus'] / df['total_pop'].replace(0, 1)) * 100
+    df['pop_85_plus_pct'] = (df['pop_85_plus'] / df['total_pop'].replace(0, 1)) * 100
     
     # Fix GEO_ID: strip the "1400000US" prefix to match shapefile GEOID
     df['GEOID'] = df['GEO_ID'].str.replace('1400000US', '', regex=False)
     
     # Keep necessary columns
-    census_df = df[['GEOID', 'NAME', 'pop_80_plus', 'pop_80_plus_pct']].copy()
+    census_df = df[['GEOID', 'NAME', 'pop_65_plus', 'pop_65_plus_pct', 'pop_85_plus', 'pop_85_plus_pct']].copy()
     
     print(f"  Processed {len(census_df)} census tract records")
-    print(f"  Total 80+ population in dataset: {census_df['pop_80_plus'].sum():,.0f}")
-    print(f"  Average percentage 80+ in dataset: {census_df['pop_80_plus_pct'].mean():.2f}%")
+    print(f"  Total 65+ population in dataset: {census_df['pop_65_plus'].sum():,.0f}")
+    print(f"  Average percentage 65+ in dataset: {census_df['pop_65_plus_pct'].mean():.2f}%")
+    print(f"  Total 85+ population in dataset: {census_df['pop_85_plus'].sum():,.0f}")
+    print(f"  Average percentage 85+ in dataset: {census_df['pop_85_plus_pct'].mean():.2f}%")
     
     return census_df
 
@@ -112,6 +127,7 @@ def merge_geo_and_census(gdf, census_df):
     """
     Inner join the shapefile GeoDataFrame with census demographic data.
     Filters out uninhabited tracts (Great Salt Lake, Airport, industrial zones).
+    Uses 65+ as the filter since it's more inclusive.
     """
     print("\nMerging shapefile with census data...")
     
@@ -121,9 +137,10 @@ def merge_geo_and_census(gdf, census_df):
     print(f"  Merged result: {initial_count} tracts with demographic data")
     
     # Remove uninhabited tracts (e.g., Great Salt Lake, Airport, Canyons)
-    merged = merged[merged['pop_80_plus'] > 0].copy()
+    # Filter on 65+ since it's more inclusive
+    merged = merged[merged['pop_65_plus'] > 0].copy()
     dropped_zero = initial_count - len(merged)
-    print(f"  Dropped {dropped_zero} tracts with zero 80+ population (e.g., water bodies/industrial)")
+    print(f"  Dropped {dropped_zero} tracts with zero 65+ population (e.g., water bodies/industrial)")
     
     # Optional: Remove tracts with tiny population but huge area (outliers)
     # These are typically rural/wilderness areas that dominate the map visually
@@ -131,20 +148,21 @@ def merge_geo_and_census(gdf, census_df):
     area_95th = merged['area_m2'].quantile(0.95)
     
     # Filter: small population (< 10) AND huge area (> 95th percentile)
-    outlier_mask = (merged['pop_80_plus'] < 10) & (merged['area_m2'] > area_95th)
+    outlier_mask = (merged['pop_65_plus'] < 10) & (merged['area_m2'] > area_95th)
     outlier_tracts = merged[outlier_mask]
     
     if len(outlier_tracts) > 0:
         print(f"  Dropping {len(outlier_tracts)} large, sparsely-populated tracts:")
         for _, row in outlier_tracts.iterrows():
-            print(f"    - {row['NAMELSAD']}: pop_80+={int(row['pop_80_plus'])}, area={row['area_m2']/1e6:.1f} km²")
+            print(f"    - {row['NAMELSAD']}: pop_65+={int(row['pop_65_plus'])}, area={row['area_m2']/1e6:.1f} km²")
         merged = merged[~outlier_mask].copy()
     
     # Clean up temp column
     merged = merged.drop(columns=['area_m2'])
     
     print(f"  Final result: {len(merged)} tracts for analysis")
-    print(f"  80+ population in study area: {merged['pop_80_plus'].sum():,.0f}")
+    print(f"  65+ population in study area: {merged['pop_65_plus'].sum():,.0f}")
+    print(f"  85+ population in study area: {merged['pop_85_plus'].sum():,.0f}")
     
     return merged
 
@@ -518,16 +536,39 @@ def geometry_to_path(geometry):
     return Path(vertices, codes)
 
 
-def create_visualization(merged_gdf, grid_x, grid_y, grid_pm25, air_df, date_range, output_file):
+def create_visualization(merged_gdf, grid_x, grid_y, grid_pm25, air_df, date_range, output_file, age_group="65plus"):
     """
     Creates side-by-side maps:
-    - Left: 80+ Population choropleth
+    - Left: Population choropleth
     - Right: PM2.5 heatmap with sensor verification points
     
     Args:
+        merged_gdf: GeoDataFrame with census tracts and population data
+        grid_x, grid_y, grid_pm25: Interpolation grid data
+        air_df: DataFrame with PurpleAir sensor data
         date_range: dict with 'start_date', 'end_date', 'interval' keys
+        output_file: Output file path for the map
+        age_group: "65plus" or "85plus" to select which age group to visualize
     """
-    print("\nStep E: Creating mirrored visualization...")
+    print(f"\nStep E: Creating mirrored visualization for {age_group}...")
+    
+    # Map age group to column names and labels
+    age_config = {
+        "65plus": {
+            "pct_col": "pop_65_plus_pct",
+            "count_col": "pop_65_plus",
+            "label": "65+",
+            "title_label": "Age 65+"
+        },
+        "85plus": {
+            "pct_col": "pop_85_plus_pct",
+            "count_col": "pop_85_plus",
+            "label": "85+",
+            "title_label": "Age 85+"
+        }
+    }
+    
+    config = age_config[age_group]
     
     # Format date range for titles
     date_str = ""
@@ -546,10 +587,10 @@ def create_visualization(merged_gdf, grid_x, grid_y, grid_pm25, air_df, date_ran
         cx.add_basemap(ax, source=cx.providers.CartoDB.Positron)
 
     # LEFT MAP: Population
-    merged_gdf.plot(column='pop_80_plus_pct', ax=ax1, cmap='Blues', alpha=0.8, 
+    merged_gdf.plot(column=config['pct_col'], ax=ax1, cmap='Blues', alpha=0.8, 
                    edgecolor='black', linewidth=0.3, legend=True,
-                   legend_kwds={'label': 'Percentage of Residents Age 80+'})
-    ax1.set_title(f'Distribution of Residents Age 80+\nSalt Lake & Davis Counties', fontsize=16)
+                   legend_kwds={'label': f'Percentage of Residents {config["title_label"]}'})
+    ax1.set_title(f'Distribution of Residents {config["title_label"]}\nSalt Lake & Davis Counties', fontsize=16)
 
     # RIGHT MAP: Air Quality
     # 1. Heatmap
@@ -603,24 +644,49 @@ def get_pm25_color(pm25_value):
         return 'red'
 
 
-def create_interactive_map(merged_gdf, air_df, date_range, output_file="slc_analysis_interactive.html"):
+def create_interactive_map(merged_gdf, air_df, date_range, output_file="slc_analysis_interactive.html", age_group="65plus"):
     """
     Create an interactive Folium map with:
-    1. Choropleth layer showing 80+ population by census tract
+    1. Choropleth layer showing population by census tract
     2. Circle markers for PurpleAir sensors colored by PM2.5 level
     3. Layer control to toggle layers on/off
     
     Args:
-        merged_gdf: GeoDataFrame with census tracts and pop_80_plus column (EPSG:3857)
+        merged_gdf: GeoDataFrame with census tracts and population columns (EPSG:3857)
         air_df: DataFrame with lat, lon, pm25, sensor_id columns
         date_range: dict with 'start_date', 'end_date', 'interval' keys
         output_file: Output HTML filename
+        age_group: "65plus" or "85plus" to select which age group to visualize
     """
-    print("\nStep F: Creating interactive Folium map...")
+    print(f"\nStep F: Creating interactive Folium map for {age_group}...")
+    
+    # Map age group to column names and labels
+    age_config = {
+        "65plus": {
+            "pct_col": "pop_65_plus_pct",
+            "count_col": "pop_65_plus",
+            "label": "65+",
+            "title_label": "Age 65+",
+            "legend_label": "Percentage of Residents Age 65+",
+            "layer_name": "Population 65+ (Census Tracts)"
+        },
+        "85plus": {
+            "pct_col": "pop_85_plus_pct",
+            "count_col": "pop_85_plus",
+            "label": "85+",
+            "title_label": "Age 85+",
+            "legend_label": "Percentage of Residents Age 85+",
+            "layer_name": "Population 85+ (Census Tracts)"
+        }
+    }
+    
+    config = age_config[age_group]
     
     # Add formatted fields for tooltip display
-    merged_gdf['pop_80_plus_pct_formatted'] = merged_gdf['pop_80_plus_pct'].apply(lambda x: f"{x:.1f}%")
-    merged_gdf['pop_80_plus_formatted'] = merged_gdf['pop_80_plus'].apply(lambda x: f"{int(x):,}")
+    pct_formatted_col = f"{config['pct_col']}_formatted"
+    count_formatted_col = f"{config['count_col']}_formatted"
+    merged_gdf[pct_formatted_col] = merged_gdf[config['pct_col']].apply(lambda x: f"{x:.1f}%")
+    merged_gdf[count_formatted_col] = merged_gdf[config['count_col']].apply(lambda x: f"{int(x):,}")
     
     # Convert merged_gdf to WGS84 (EPSG:4326) for Folium
     gdf_wgs84 = merged_gdf.to_crs(epsg=4326)
@@ -648,14 +714,14 @@ def create_interactive_map(merged_gdf, air_df, date_range, output_file="slc_anal
     choropleth = folium.Choropleth(
         geo_data=gdf_wgs84.__geo_interface__,
         data=gdf_wgs84,
-        columns=['GEOID', 'pop_80_plus_pct'],
+        columns=['GEOID', config['pct_col']],
         key_on='feature.properties.GEOID',
         fill_color='Blues',
         fill_opacity=0.6,
         line_opacity=0.3,
         line_weight=1,
-        legend_name='Percentage of Residents Age 80+',
-        name='Population 80+ (Census Tracts)',
+        legend_name=config['legend_label'],
+        name=config['layer_name'],
         highlight=True
     ).add_to(m)
     
@@ -675,8 +741,8 @@ def create_interactive_map(merged_gdf, air_df, date_range, output_file="slc_anal
             'fillOpacity': 0.1
         },
         tooltip=GeoJsonTooltip(
-            fields=['NAMELSAD', 'pop_80_plus_pct_formatted', 'pop_80_plus_formatted'],
-            aliases=['Census Tract:', 'Percentage 80+:', 'Population 80+ (Count):'],
+            fields=['NAMELSAD', pct_formatted_col, count_formatted_col],
+            aliases=[f'Census Tract:', f'Percentage {config["label"]}:', f'Population {config["label"]} (Count):'],
             localize=True,
             sticky=True,
             labels=True,
@@ -809,14 +875,22 @@ def main():
     bounds = merged_gdf.total_bounds
     grid_x, grid_y, grid_pm25 = create_pm25_heatmap(air_df, bounds, resolution=200)
     
-    # Step E: Create visualization (now includes air_df for sensor markers and date range)
-    create_visualization(merged_gdf, grid_x, grid_y, grid_pm25, air_df, date_range, OUTPUT_FILE)
+    # Step E: Create visualizations for both age groups
+    create_visualization(merged_gdf, grid_x, grid_y, grid_pm25, air_df, date_range, "final_analysis_map_65plus.png", age_group="65plus")
+    create_visualization(merged_gdf, grid_x, grid_y, grid_pm25, air_df, date_range, "final_analysis_map_85plus.png", age_group="85plus")
     
-    # Step F: Create interactive map
-    create_interactive_map(merged_gdf, air_df, date_range, "slc_analysis_interactive.html")
+    # Step F: Create interactive maps for both age groups
+    create_interactive_map(merged_gdf, air_df, date_range, "slc_analysis_interactive_65plus.html", age_group="65plus")
+    create_interactive_map(merged_gdf, air_df, date_range, "slc_analysis_interactive_85plus.html", age_group="85plus")
     
     print("\n" + "=" * 60)
     print("Pipeline complete!")
+    print("  65+ Maps:")
+    print(f"    Static map:      final_analysis_map_65plus.png")
+    print(f"    Interactive map: slc_analysis_interactive_65plus.html")
+    print("  85+ Maps:")
+    print(f"    Static map:      final_analysis_map_85plus.png")
+    print(f"    Interactive map: slc_analysis_interactive_85plus.html")
     print("=" * 60)
 
 if __name__ == "__main__":
