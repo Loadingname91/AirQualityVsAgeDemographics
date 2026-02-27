@@ -99,4 +99,4 @@ config.json
 .cursor/*
 
 .generate*
-Data/VolunteerData/Residential and Employment History.pdf
+Data/VolunteerData/Residential*
