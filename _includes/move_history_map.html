@@ -1,0 +1,134 @@
+<section class="move-history-tool" data-baseurl="{{ site.baseurl }}">
+  <h2>Move History Timeline</h2>
+  <p class="mh-intro">
+    Enter residential history as CSV or JSON to map each move in order and estimate PM2.5 exposure by residence.
+  </p>
+
+  <div class="mh-controls">
+    <div class="mh-input-row">
+      <label for="mh-source">PM2.5 source:</label>
+      <label class="mh-radio"><input type="radio" name="mh-source" value="purpleair" checked> PurpleAir (Jan 1-25, 2026)</label>
+      <label class="mh-radio"><input type="radio" name="mh-source" value="epa"> EPA AQS (Jan 1-30, 2025)</label>
+    </div>
+
+    <div class="mh-input-row">
+      <label for="mh-color-mode">Marker colors:</label>
+      <label class="mh-radio"><input type="radio" name="mh-color-mode" value="era" checked> By era</label>
+      <label class="mh-radio"><input type="radio" name="mh-color-mode" value="pm25"> By PM2.5</label>
+    </div>
+
+    <div class="mh-input-row">
+      <label for="mh-history-input">Residential history (CSV or JSON):</label>
+      <textarea id="mh-history-input" rows="7" placeholder='CSV example:
+zip,start_date,end_date
+84102,2010-01,2015-06
+84101,2015-07,2020-12
+84003,2021-01,
+
+JSON example:
+[
+  {"zip":"84102","start":"2010-01","end":"2015-06"},
+  {"zip":"84101","start":"2015-07","end":"2020-12"}
+]'></textarea>
+    </div>
+
+    <div class="mh-input-row">
+      <button type="button" id="mh-build-btn" class="mh-btn">Build Timeline</button>
+      <button type="button" id="mh-demo-btn" class="mh-btn mh-btn-secondary">Load Demo Data</button>
+    </div>
+
+    <div id="mh-status" class="mh-status" aria-live="polite"></div>
+  </div>
+
+  <div id="mh-map" class="mh-map"></div>
+
+  <div class="mh-chart-wrap">
+    <h3>Estimated PM2.5 at Residence Over Time</h3>
+    <canvas id="mh-chart" height="120"></canvas>
+    <div id="mh-move-deltas" class="mh-deltas"></div>
+  </div>
+</section>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+<script src="{{ '/assets/js/move_history.js' | relative_url }}" defer></script>
+
+<style>
+.move-history-tool {
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid #ecf0f1;
+}
+.mh-intro {
+  color: #555;
+  margin-bottom: 1rem;
+}
+.mh-controls {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 1rem;
+  background: #fafafa;
+}
+.mh-input-row {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.mh-input-row label {
+  font-weight: 600;
+}
+.mh-radio {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+#mh-history-input {
+  width: 100%;
+  min-height: 180px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.6rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9rem;
+}
+.mh-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  background: #2c3e50;
+  color: #fff;
+  cursor: pointer;
+}
+.mh-btn-secondary {
+  background: #6c7a89;
+}
+.mh-btn:hover {
+  opacity: 0.95;
+}
+.mh-status {
+  min-height: 1.4rem;
+  color: #555;
+}
+.mh-map {
+  width: 100%;
+  height: 430px;
+  margin-top: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.mh-chart-wrap {
+  margin-top: 1.5rem;
+}
+.mh-deltas {
+  margin-top: 0.75rem;
+  padding-left: 1rem;
+  color: #444;
+}
+.mh-deltas ul {
+  margin: 0.5rem 0;
+}
+</style>

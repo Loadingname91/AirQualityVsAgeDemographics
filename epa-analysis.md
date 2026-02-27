@@ -134,10 +134,6 @@ permalink: epa-analysis/
 - Legend with data period (January 1-30, 2025) and station counts
 - Responsive design for desktop and mobile viewing
 
-### ZIP Exposure Tool
-
-{% include zip_exposure_tool.html default_source="epa" %}
-
 ---
 
 ## Key Findings

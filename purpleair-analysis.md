@@ -165,10 +165,6 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 - Legend with data period (January 1-25, 2026) and sensor counts
 - Responsive design for desktop and mobile viewing
 
-### ZIP Exposure Tool
-
-{% include zip_exposure_tool.html default_source="purpleair" source_locked="purpleair" %}
-
 ---
 
 ## Key Findings
