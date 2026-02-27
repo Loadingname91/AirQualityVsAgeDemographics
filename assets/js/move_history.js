@@ -246,6 +246,13 @@
     labels.push(records[records.length - 1].endLabel);
     values.push(Number(records[records.length - 1].pm25.toFixed(2)));
 
+    const minVal = Math.min(...values);
+    const maxVal = Math.max(...values);
+    const range = maxVal - minVal || 1;
+    const padding = Math.max(range * 0.25, 2);
+    const suggestedMin = Math.max(0, minVal - padding);
+    const suggestedMax = maxVal + padding;
+
     chart = new Chart(canvas, {
       type: 'line',
       data: {
@@ -274,7 +281,8 @@
         scales: {
           y: {
             title: { display: true, text: 'PM2.5 (µg/m³)' },
-            beginAtZero: true
+            suggestedMin,
+            suggestedMax
           },
           x: {
             title: { display: true, text: 'Residence timeline' }
