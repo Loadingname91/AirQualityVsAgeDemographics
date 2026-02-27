@@ -167,7 +167,7 @@ Corrected PM2.5 = (0.778 × Raw_CF1) + 2.65
 
 ### ZIP Exposure Tool
 
-{% include zip_exposure_tool.html default_source="purpleair" %}
+{% include zip_exposure_tool.html default_source="purpleair" source_locked="purpleair" %}
 
 ---
 

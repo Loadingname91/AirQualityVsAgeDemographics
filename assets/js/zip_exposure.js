@@ -15,6 +15,9 @@
   let map = null;
   let markers = [];
   let circles = [];
+  let sensorMarkers = [];
+  let lastResults = [];
+  let lastBufferM = 0;
 
   function getBaseUrl() {
     const el = document.querySelector('.zip-exposure-tool');
@@ -84,6 +87,26 @@
     return count > 0 ? sum / count : null;
   }
 
+  function getContributingSensors(lat, lon, points, maxN) {
+    if (!points || points.length === 0) return [];
+    const ranked = [];
+    for (const p of points) {
+      const dKm = haversineKm(lat, lon, p.lat, p.lon);
+      const dM = Math.max(dKm * 1000, 10);
+      const weight = 1 / Math.pow(dM, IDW_POWER);
+      ranked.push({
+        id: p.id || 'Unknown',
+        lat: p.lat,
+        lon: p.lon,
+        pm25: p.pm25,
+        distKm: dKm,
+        weight
+      });
+    }
+    ranked.sort((a, b) => b.weight - a.weight);
+    return ranked.slice(0, maxN);
+  }
+
   async function loadCsv(url) {
     const base = getBaseUrl();
     const path = url.startsWith('/') ? url.slice(1) : url;
@@ -109,6 +132,7 @@
     if (source === 'purpleair' && !purpleAirPoints) {
       const rows = await loadCsv('/assets/data/purpleair_sensor_means_2026-01-01_2026-01-25.csv');
       purpleAirPoints = rows.map((r) => ({
+        id: r.sensor_id,
         lat: parseFloat(r.lat),
         lon: parseFloat(r.lon),
         pm25: parseFloat(r.pm25)
@@ -117,6 +141,7 @@
     if (source === 'epa' && !epaPoints) {
       const rows = await loadCsv('/assets/data/epa_station_means_2025-01-01_2025-01-30.csv');
       epaPoints = rows.map((r) => ({
+        id: r.local_site_name || r.site_number,
         lat: parseFloat(r.lat),
         lon: parseFloat(r.lon),
         pm25: parseFloat(r.pm25)
@@ -141,9 +166,16 @@
     markers = [];
     circles.forEach((c) => c.remove());
     circles = [];
+    sensorMarkers.forEach((m) => m.remove());
+    sensorMarkers = [];
   }
 
-  function renderMap(results, bufferM) {
+  function isShowSensorsEnabled() {
+    const showSensors = document.getElementById('zip-tool-show-sensors');
+    return showSensors ? showSensors.checked : true;
+  }
+
+  function renderMap(results, bufferM, showSensors) {
     const container = document.getElementById('zip-tool-map');
     if (!container) return;
     clearMap();
@@ -178,6 +210,28 @@
           weight: 1
         }).addTo(map);
         circles.push(circle);
+      }
+      if (showSensors && r.contributingSensors && r.contributingSensors.length > 0) {
+        for (const sensor of r.contributingSensors) {
+          const sensorMarker = L.circleMarker([sensor.lat, sensor.lon], {
+            radius: 6,
+            fillColor: getPm25Color(sensor.pm25),
+            color: '#2c3e50',
+            weight: 1,
+            fillOpacity: 0.9
+          }).addTo(map);
+          const sensorPm = sensor.pm25 != null ? sensor.pm25.toFixed(1) : 'N/A';
+          const sensorDist = sensor.distKm != null ? sensor.distKm.toFixed(2) : 'N/A';
+          sensorMarker.bindTooltip(
+            `Sensor ${sensor.id}<br>PM2.5: ${sensorPm} µg/m³<br>Distance: ${sensorDist} km`,
+            { sticky: true, direction: 'top' }
+          );
+          sensorMarker.bindPopup(
+            `<b>Sensor ${sensor.id}</b><br>PM2.5: ${sensorPm} µg/m³<br>Distance to ZIP centroid: ${sensorDist} km`
+          );
+          sensorMarkers.push(sensorMarker);
+          bounds.push([sensor.lat, sensor.lon]);
+        }
       }
     }
     if (bounds.length > 1) {
@@ -233,12 +287,14 @@
         if (isNaN(lat) || isNaN(lon)) continue;
         const pm25Point = idwAt(lat, lon, points);
         const pm25Buffer = bufferM > 0 ? bufferMean(lat, lon, bufferM, points) : null;
+        const contributingSensors = getContributingSensors(lat, lon, points, 15);
         results.push({
           zip,
           lat,
           lon,
           pm25Point,
-          pm25Buffer
+          pm25Buffer,
+          contributingSensors
         });
       }
       if (notFound.length > 0) {
@@ -246,7 +302,9 @@
       } else {
         status.textContent = `Found ${results.length} ZIP(s).`;
       }
-      renderMap(results, bufferM);
+      lastResults = results;
+      lastBufferM = bufferM;
+      renderMap(results, bufferM, isShowSensorsEnabled());
       renderTable(results, bufferM);
     } catch (e) {
       status.textContent = 'Error: ' + (e.message || 'Could not load data.');
@@ -259,6 +317,14 @@
     if (!tool) return;
     const btn = document.getElementById('zip-tool-compute');
     if (btn) btn.addEventListener('click', compute);
+    const showSensors = document.getElementById('zip-tool-show-sensors');
+    if (showSensors) {
+      showSensors.addEventListener('change', () => {
+        if (lastResults.length > 0) {
+          renderMap(lastResults, lastBufferM, isShowSensorsEnabled());
+        }
+      });
+    }
     document.querySelectorAll('input[name="zip-tool-source"]').forEach((radio) => {
       radio.addEventListener('change', () => {
         purpleAirPoints = null;

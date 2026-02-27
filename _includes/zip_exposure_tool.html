@@ -2,23 +2,37 @@
   ZIP Exposure Tool - reusable widget for PM2.5 exposure by ZIP code.
   Usage: {% include zip_exposure_tool.html default_source="purpleair" %}
   default_source: "purpleair" or "epa"
+  source_locked: optional "purpleair" or "epa" to lock dataset selection
 {% endcomment %}
 {% assign ds = include.default_source | default: "purpleair" %}
+{% assign locked = include.source_locked | default: "" %}
 
-<section class="zip-exposure-tool" data-default-source="{{ ds }}" data-baseurl="{{ site.baseurl }}">
+<section class="zip-exposure-tool" data-default-source="{{ ds }}" data-source-locked="{{ locked }}" data-baseurl="{{ site.baseurl }}">
   <h2>ZIP Code PM2.5 Exposure Tool</h2>
   <p class="zip-tool-intro">Enter one or more ZIP codes (comma or newline separated) to estimate PM2.5 exposure at each location using interpolated data.</p>
 
   <div class="zip-tool-controls">
     <div class="zip-tool-dataset-tabs">
-      <label class="zip-tab">
-        <input type="radio" name="zip-tool-source" value="purpleair" {% if ds == "purpleair" %}checked{% endif %}>
-        <span>PurpleAir (Jan 1–25, 2026)</span>
-      </label>
-      <label class="zip-tab">
-        <input type="radio" name="zip-tool-source" value="epa" {% if ds == "epa" %}checked{% endif %}>
-        <span>EPA AQS (Jan 1–30, 2025)</span>
-      </label>
+      {% if locked == "purpleair" %}
+        <label class="zip-tab zip-tab-locked">
+          <input type="radio" name="zip-tool-source" value="purpleair" checked>
+          <span>PurpleAir (Jan 1–25, 2026)</span>
+        </label>
+      {% elsif locked == "epa" %}
+        <label class="zip-tab zip-tab-locked">
+          <input type="radio" name="zip-tool-source" value="epa" checked>
+          <span>EPA AQS (Jan 1–30, 2025)</span>
+        </label>
+      {% else %}
+        <label class="zip-tab">
+          <input type="radio" name="zip-tool-source" value="purpleair" {% if ds == "purpleair" %}checked{% endif %}>
+          <span>PurpleAir (Jan 1–25, 2026)</span>
+        </label>
+        <label class="zip-tab">
+          <input type="radio" name="zip-tool-source" value="epa" {% if ds == "epa" %}checked{% endif %}>
+          <span>EPA AQS (Jan 1–30, 2025)</span>
+        </label>
+      {% endif %}
     </div>
 
     <div class="zip-tool-input-row">
@@ -34,10 +48,15 @@
         <option value="500">500 m</option>
         <option value="1000">1 km</option>
       </select>
+      <label for="zip-tool-show-sensors" class="zip-tool-toggle">
+        <input type="checkbox" id="zip-tool-show-sensors" checked>
+        Show contributing sensors
+      </label>
       <button type="button" id="zip-tool-compute" class="zip-tool-btn">Compute</button>
     </div>
 
     <div id="zip-tool-status" class="zip-tool-status" aria-live="polite"></div>
+    <p class="zip-tool-legend-note">Large markers are ZIP centroid estimates; small colored markers show nearby contributing sensors and their PM2.5 values.</p>
   </div>
 
   <div id="zip-tool-map" class="zip-tool-map"></div>
@@ -93,6 +112,9 @@
   background: #3498db;
   color: white;
 }
+.zip-tab-locked {
+  cursor: default;
+}
 .zip-tool-input-row { margin-bottom: 1rem; }
 .zip-tool-input-row label { display: block; margin-bottom: 0.25rem; font-weight: 600; }
 .zip-tool-input-row textarea {
@@ -116,6 +138,16 @@
   border: 1px solid #ddd;
   border-radius: 4px;
 }
+.zip-tool-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+.zip-tool-toggle input {
+  margin: 0;
+}
 .zip-tool-btn {
   padding: 0.5rem 1.25rem;
   background: #2c3e50;
@@ -130,6 +162,11 @@
   min-height: 1.5rem;
   font-size: 0.9rem;
   color: #666;
+}
+.zip-tool-legend-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #555;
 }
 .zip-tool-map {
   width: 100%;
