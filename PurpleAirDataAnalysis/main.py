@@ -285,6 +285,21 @@ def process_purpleair_data(purpleair_dir, sensor_lookup):
     
     return air_df, date_range_info
 
+
+def export_sensor_means_for_web(air_df, date_range_info, output_dir):
+    """
+    Export compact sensor-means CSV for the ZIP Exposure Tool on GitHub Pages.
+    Columns: sensor_id, lat, lon, pm25
+    """
+    if len(air_df) == 0:
+        return
+    out_path = os.path.join(output_dir, "assets", "data", "purpleair_sensor_means_2026-01-01_2026-01-25.csv")
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    export_df = air_df[['sensor_id', 'lat', 'lon', 'pm25']].copy()
+    export_df.columns = ['sensor_id', 'lat', 'lon', 'pm25']
+    export_df.to_csv(out_path, index=False)
+    print(f"  Exported sensor means to: {out_path}")
+
 # =============================================================================
 # Step C.5: Create Data Analysis Plots
 # =============================================================================
@@ -863,6 +878,9 @@ def main():
     # Step C: Process PurpleAir sensor data
     sensor_lookup = load_sensor_locations(SENSOR_LIST_PATH)
     air_df, date_range = process_purpleair_data(PURPLEAIR_DIR, sensor_lookup)
+    
+    # Export sensor means for ZIP Exposure Tool
+    export_sensor_means_for_web(air_df, date_range, os.path.join(os.path.dirname(__file__), ".."))
     
     if len(air_df) == 0:
         print("\nERROR: No valid sensor data found. Cannot create heatmap.")

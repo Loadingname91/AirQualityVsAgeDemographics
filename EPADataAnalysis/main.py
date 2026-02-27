@@ -209,6 +209,22 @@ def process_epa_data(epa_data_path):
     
     return epa_sites, df_filtered
 
+
+def export_station_means_for_web(epa_sites, output_dir):
+    """
+    Export compact EPA station-means CSV for the ZIP Exposure Tool on GitHub Pages.
+    Columns: site_number, local_site_name, lat, lon, pm25
+    """
+    if len(epa_sites) == 0:
+        return
+    out_path = os.path.join(output_dir, "assets", "data", "epa_station_means_2025-01-01_2025-01-30.csv")
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    export_df = epa_sites[['site_number', 'local_site_name', 'latitude', 'longitude', 'pm25_value']].copy()
+    export_df.columns = ['site_number', 'local_site_name', 'lat', 'lon', 'pm25']
+    export_df.to_csv(out_path, index=False)
+    print(f"  Exported EPA station means to: {out_path}")
+
+
 # =============================================================================
 # Step C.5: Create Data Analysis Plots
 # =============================================================================
@@ -734,6 +750,9 @@ def main():
     
     # Step C: Process EPA air quality data
     epa_sites, df_filtered = process_epa_data(EPA_DATA_PATH)
+    
+    # Export station means for ZIP Exposure Tool
+    export_station_means_for_web(epa_sites, os.path.join(os.path.dirname(__file__), ".."))
     
     if len(epa_sites) == 0:
         print("\nERROR: No valid EPA data found.")

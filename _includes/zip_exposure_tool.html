@@ -1,0 +1,157 @@
+{% comment %}
+  ZIP Exposure Tool - reusable widget for PM2.5 exposure by ZIP code.
+  Usage: {% include zip_exposure_tool.html default_source="purpleair" %}
+  default_source: "purpleair" or "epa"
+{% endcomment %}
+{% assign ds = include.default_source | default: "purpleair" %}
+
+<section class="zip-exposure-tool" data-default-source="{{ ds }}" data-baseurl="{{ site.baseurl }}">
+  <h2>ZIP Code PM2.5 Exposure Tool</h2>
+  <p class="zip-tool-intro">Enter one or more ZIP codes (comma or newline separated) to estimate PM2.5 exposure at each location using interpolated data.</p>
+
+  <div class="zip-tool-controls">
+    <div class="zip-tool-dataset-tabs">
+      <label class="zip-tab">
+        <input type="radio" name="zip-tool-source" value="purpleair" {% if ds == "purpleair" %}checked{% endif %}>
+        <span>PurpleAir (Jan 1–25, 2026)</span>
+      </label>
+      <label class="zip-tab">
+        <input type="radio" name="zip-tool-source" value="epa" {% if ds == "epa" %}checked{% endif %}>
+        <span>EPA AQS (Jan 1–30, 2025)</span>
+      </label>
+    </div>
+
+    <div class="zip-tool-input-row">
+      <label for="zip-tool-input">ZIP codes:</label>
+      <textarea id="zip-tool-input" rows="3" placeholder="e.g. 84101&#10;84101, 84102, 84003"></textarea>
+    </div>
+
+    <div class="zip-tool-options">
+      <label for="zip-tool-buffer">Buffer radius:</label>
+      <select id="zip-tool-buffer">
+        <option value="0">Point only</option>
+        <option value="250">250 m</option>
+        <option value="500">500 m</option>
+        <option value="1000">1 km</option>
+      </select>
+      <button type="button" id="zip-tool-compute" class="zip-tool-btn">Compute</button>
+    </div>
+
+    <div id="zip-tool-status" class="zip-tool-status" aria-live="polite"></div>
+  </div>
+
+  <div id="zip-tool-map" class="zip-tool-map"></div>
+
+  <div id="zip-tool-results" class="zip-tool-results">
+    <table id="zip-tool-table" class="zip-results-table" hidden>
+      <thead>
+        <tr>
+          <th>ZIP</th>
+          <th>Lat</th>
+          <th>Lon</th>
+          <th>PM2.5 (µg/m³) at point</th>
+          <th>PM2.5 (µg/m³) buffer mean</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{{ '/assets/js/zip_exposure.js' | relative_url }}" defer></script>
+
+<style>
+.zip-exposure-tool {
+  margin: 2rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid #ecf0f1;
+}
+.zip-exposure-tool h2 { margin-bottom: 0.5rem; }
+.zip-tool-intro {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+}
+.zip-tool-dataset-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.zip-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #ecf0f1;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.zip-tab input { margin-right: 0.5rem; }
+.zip-tab:has(input:checked) {
+  background: #3498db;
+  color: white;
+}
+.zip-tool-input-row { margin-bottom: 1rem; }
+.zip-tool-input-row label { display: block; margin-bottom: 0.25rem; font-weight: 600; }
+.zip-tool-input-row textarea {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+}
+.zip-tool-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.zip-tool-options label { font-weight: 600; }
+.zip-tool-options select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.zip-tool-btn {
+  padding: 0.5rem 1.25rem;
+  background: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.zip-tool-btn:hover { background: #34495e; }
+.zip-tool-status {
+  min-height: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+.zip-tool-map {
+  width: 100%;
+  height: 400px;
+  margin: 1rem 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.zip-tool-results { margin-top: 1rem; }
+.zip-results-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.zip-results-table th,
+.zip-results-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+.zip-results-table th {
+  background: #34495e;
+  color: white;
+}
+.zip-results-table tr:hover { background: #f5f5f5; }
+</style>
